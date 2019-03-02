@@ -7,8 +7,12 @@ board = Board(boardWidth, boardHeight)
 
 
 def main():
-    initializePygame()
-    createBoard()
+    pygame.init()
+    pygame.display.set_caption("Connect Four: COMP4106 Style")
+    screen = pygame.display.set_mode((1500, 1500))
+
+    initialize_pygame(screen)
+    create_board(screen)
     running = True
 
     while running:
@@ -18,11 +22,10 @@ def main():
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             running = False
 
+        pygame.display.flip()
 
-def initializePygame():
-    pygame.init()
-    pygame.display.set_caption("Connect Four: COMP4106 Style")
-    screen = pygame.display.set_mode((1500, 1500))
+
+def initialize_pygame(screen):
     screen.fill((253, 253, 253))
     pygame.font.init()
     f = pygame.font.SysFont('Arial', 20)
@@ -31,16 +34,22 @@ def initializePygame():
     pygame.display.flip()
 
 
-def createBoard():
-    offsetX = 475
-    offsetY = 125
-    block_size = 30
-    x = 50
-    y = 50
-    image = pygame.image.load("assets/images/empty-slot.png")
-    # for x in range(board.height):
-    #     for y in range(board.width):
-    #         board[x][y] =
+def create_board(screen):
+    offset_x = 100
+    offset_y = 100
+    start_x = 400
+    start_y = 80
+    block_size = 10
+    image = pygame.image.load('assets/images/empty-slot.png').convert()
+
+    for x in range(board.width):
+        for y in range(board.height):
+            rect = pygame.Rect(x*offset_x+start_x, y*offset_y+start_y, block_size, block_size)
+            # board.grid[x][y] = screen.blit(image, rect)
+            screen.blit(image, rect)
+
+    pygame.display.update()
+
 
 if __name__ == "__main__":
     main()
