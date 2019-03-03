@@ -27,15 +27,18 @@ class Game:
             pygame.time.delay(50)
 
             # both AI make a move
-            self.change_counter(screen, 0, 0, 1)
-            self.change_counter(screen, 0, 1, 1)
-            self.change_counter(screen, 0, 2, 1)
-            self.change_counter(screen, 0, 3, 1)
-
+            self.change_counter(screen, 2, 0, 2)
+            self.change_counter(screen, 3, 0, 2)
+            self.change_counter(screen, 1, 0, 2)
+            self.change_counter(screen, 4, 0, 2)
 
             # check if game's over
             if self.check_win(screen, self.player1Color) is True:
-                print("Someone won the game!")
+                print("Green won the game!")
+                self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                self.create_board(screen)  # reset UI
+            elif self.check_win(screen, self.player2Color) is True:
+                print("Purple won the game!")
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 self.create_board(screen)  # reset UI
 
@@ -87,10 +90,17 @@ class Game:
     def check_win(self, screen, color):
         # check if horizontal win -
         for x in range(self.board.height):
-            for y in range(self.board.width-2):
+            for y in range(self.board.width-3):
                 # print(self.board.grid[x][y].color)
                 if self.board.grid[x][y].color is color:
                     if self.board.grid[x][y+1].color is color and self.board.grid[x][y+2].color is color and self.board.grid[x][y+3].color is color:
+                        return True
+
+        # check if vertical win |
+        for x in range(self.board.width):
+            for y in range(self.board.height-3):
+                if self.board.grid[y][x].color is color:
+                    if self.board.grid[y+1][x].color is color and self.board.grid[y+2][x].color is color and self.board.grid[y+3][x].color is color:
                         return True
 
 

@@ -17,7 +17,6 @@ class Board:
     def set_counter_color(self, height, width, color):
         self.grid[height][width].color = color
 
-
     def set_rect(self, height, width, rect):
         self.grid[height][width].set_rect = rect
 
