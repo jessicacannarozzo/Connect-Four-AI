@@ -1,8 +1,14 @@
 import pygame
+from assets.Board import Board
+
+boardHeight = 6
+boardWidth = 7
+board = Board(boardWidth, boardHeight)
 
 
 def main():
     initializePygame()
+    createBoard()
     running = True
 
     while running:
@@ -24,6 +30,17 @@ def initializePygame():
     screen.blit(textsurface, (625, 40))
     pygame.display.flip()
 
+
+def createBoard():
+    offsetX = 475
+    offsetY = 125
+    block_size = 30
+    x = 50
+    y = 50
+    image = pygame.image.load("assets/images/empty-slot.png")
+    # for x in range(board.height):
+    #     for y in range(board.width):
+    #         board[x][y] =
 
 if __name__ == "__main__":
     main()
