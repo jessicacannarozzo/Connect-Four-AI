@@ -20,3 +20,11 @@ class Board:
     def set_rect(self, height, width, rect):
         self.grid[height][width].set_rect = rect
 
+    def is_full(self):
+        for x in range(self.height):
+            for y in range(self.width):
+                if self.grid[x][y].has_counter() is None:
+                    return False
+
+        return True
+

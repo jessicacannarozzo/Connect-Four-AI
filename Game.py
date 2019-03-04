@@ -27,10 +27,6 @@ class Game:
             pygame.time.delay(50)
 
             # both AI make a move
-            self.change_counter(screen, 2, 6, 2)
-            self.change_counter(screen, 3, 0, 2)
-            self.change_counter(screen, 4, 4, 2)
-            self.change_counter(screen, 5, 3, 2)
 
             # check if game's over
             if self.check_win(self.player1Color) is True:
@@ -41,7 +37,10 @@ class Game:
                 print("Purple won the game!")
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 self.create_board(screen)  # reset UI
-
+            elif self.board.is_full() is True:
+                print("Tie game, all spaces are filled.")
+                self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                self.create_board(screen)  # reset UI
             pygame.event.pump()
             if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 running = False
@@ -113,8 +112,6 @@ class Game:
         # check diagonal /
         for x in range(self.board.height-3):
             for y in reversed(range(3, self.board.width)):
-                print(str(x) + ", " + str(y))
-                print("BLAH" + str(x+1) + ", " + str(y-1))
                 if self.board.grid[x][y].color is color:
                     if self.board.grid[x + 1][y - 1].color is color and self.board.grid[x + 2][y - 2].color is color and self.board.grid[x + 3][y - 3].color is color:
                         return True
