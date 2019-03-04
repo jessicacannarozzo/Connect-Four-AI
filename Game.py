@@ -4,6 +4,11 @@ from assets.Board import Board
 boardHeight = 6
 boardWidth = 7
 board = Board(boardWidth, boardHeight)
+player1Color = 'GREEN'
+player2Color = 'PURPLE'
+empty_slot_path = 'assets/images/empty-slot.png'
+player1_counter_path = 'assets/images/green-counter.png'
+player2_counter_path = 'assets/images/purple-counter.png'
 
 
 def main():
@@ -16,8 +21,13 @@ def main():
     running = True
 
     while running:
-        pygame.display.update()
         pygame.time.delay(50)
+
+        change_counter(screen, 2, 2, 2)
+        change_counter(screen, 2, 0, 1)
+        change_counter(screen, 2, 1, 1)
+        change_counter(screen, 1, 2, 1)
+
         pygame.event.pump()
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             running = False
@@ -40,13 +50,27 @@ def create_board(screen):
     start_x = 400
     start_y = 80
     block_size = 10
-    image = pygame.image.load('assets/images/empty-slot.png').convert()
+    empty_slot = pygame.image.load(empty_slot_path).convert()
 
     for x in range(board.width):
         for y in range(board.height):
             rect = pygame.Rect(x*offset_x+start_x, y*offset_y+start_y, block_size, block_size)
-            # board.grid[x][y] = screen.blit(image, rect)
-            screen.blit(image, rect)
+            board.grid[y][x].set_rect(rect)
+            screen.blit(empty_slot, rect)
+
+    pygame.display.update()
+
+
+def change_counter(screen, x, y, player_num):
+    if player_num is 1:
+        green_slot = pygame.image.load(player1_counter_path).convert()
+        board.grid[x][y].set_color = player1Color
+        screen.blit(green_slot, board.grid[x][y].rect)
+
+    elif player_num is 2:
+        purple_slot = pygame.image.load(player2_counter_path).convert()
+        board.grid[x][y].set_color = player2Color
+        screen.blit(purple_slot, board.grid[x][y].rect)
 
     pygame.display.update()
 

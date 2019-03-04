@@ -14,6 +14,10 @@ class Board:
 
     # Change color of counter at index height,width
     # empty space => color = None
-    def set(self, height, width, color):
+    def set_color(self, height, width, color):
         self.grid[height][width] = Counter(color)
+
+
+    def set_rect(self, height, width, rect):
+        self.grid[height][width].set_rect = rect
 
