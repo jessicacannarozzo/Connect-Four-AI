@@ -5,6 +5,9 @@ from assets.Board import Board
 class Game:
 
     def __init__(self):
+        # 0: play option 1 of game, 1: play option 2 of game where players are allowed to remove pieces from the bottom
+        self.gameChoice = 1
+
         self.boardHeight = 6
         self.boardWidth = 7
         self.board = Board(self.boardWidth, self.boardHeight)
@@ -23,10 +26,19 @@ class Game:
         self.create_board(screen)
         running = True
 
+        self.add_counter(screen, 4, 1)
+        self.add_counter(screen, 4, 2)
+        self.add_counter(screen, 4, 1)
+        self.add_counter(screen, 4, 2)
+
+
         while running:
             pygame.time.delay(50)
 
             # both AI make a move
+
+            if self.gameChoice is 1:
+                self.board.grid = self.remove_from_bottom(screen, 4, self.player1Color, self.board.grid)
 
             # check if game's over
             if self.check_win(self.player1Color) is True:
@@ -71,6 +83,30 @@ class Game:
 
         pygame.display.update()
 
+    def remove_from_bottom(self, screen, col, color, grid):
+        empty_slot = pygame.image.load(self.empty_slot_path).convert()
+        green_slot = pygame.image.load(self.player1_counter_path).convert()
+        purple_slot = pygame.image.load(self.player2_counter_path).convert()
+
+        if self.board.grid[self.boardHeight-1][col].color is color:  # it is the right color
+            # move all elements down
+            for row in reversed(range(self.boardWidth-1)):
+                if self.board.grid[row-1][col].color is self.player1Color:
+                    screen.blit(green_slot, self.board.grid[row][col].rect)
+                elif self.board.grid[row-1][col].color is self.player2Color:
+                    screen.blit(purple_slot, self.board.grid[row][col].rect)
+                else:
+                    screen.blit(empty_slot, self.board.grid[row][col].rect)
+
+                if row == 0:
+                    screen.blit(empty_slot, self.board.grid[row][col].rect)
+
+                new_color = self.board.grid[row-1][col].color
+                self.board.grid[row][col].color = new_color
+                pygame.display.update()
+
+        return grid
+
     def change_counter(self, screen, x, y, player_num):
         if player_num == 1:
             green_slot = pygame.image.load(self.player1_counter_path).convert()
@@ -82,6 +118,20 @@ class Game:
             purple_slot = pygame.image.load(self.player2_counter_path).convert()
             self.board.set_counter_color(x, y, self.player2Color)
             screen.blit(purple_slot, self.board.grid[x][y].rect)
+
+        pygame.display.update()
+
+    def add_counter(self, screen, col, player_num):
+        if player_num == 1:
+            green_slot = pygame.image.load(self.player1_counter_path).convert()
+            x = self.board.add_counter(col, self.player1Color)
+            # print(self.board.grid[x][y].color)
+            screen.blit(green_slot, self.board.grid[x][col].rect)
+
+        elif player_num == 2:
+            purple_slot = pygame.image.load(self.player2_counter_path).convert()
+            x = self.board.add_counter(col, self.player2Color)
+            screen.blit(purple_slot, self.board.grid[x][col].rect)
 
         pygame.display.update()
 
