@@ -1,12 +1,15 @@
 import pygame
 from assets.Board import Board
+from AI import AI
 
 
 class Game:
 
     def __init__(self):
         # 0: play option 1 of game, 1: play option 2 of game where players are allowed to remove pieces from the bottom
-        self.gameChoice = 1
+        self.gameChoice = 0
+        self.first_ai_method_choice = 0
+        self.second_ai_method_choice = 0
 
         self.boardHeight = 6
         self.boardWidth = 7
@@ -25,11 +28,12 @@ class Game:
         self.initialize_pygame(screen)
         self.create_board(screen)
         running = True
+        ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, self.player1Color)
 
-        self.add_counter(screen, 4, 1)
-        self.add_counter(screen, 4, 2)
-        self.add_counter(screen, 4, 1)
-        self.add_counter(screen, 4, 2)
+        # self.add_counter(screen, 4, 1)
+        # self.add_counter(screen, 4, 2)
+        # self.add_counter(screen, 4, 1)
+        # self.add_counter(screen, 4, 2)
 
 
         while running:
@@ -37,8 +41,8 @@ class Game:
 
             # both AI make a move
 
-            if self.gameChoice is 1:
-                self.board.grid = self.remove_from_bottom(screen, 4, self.player1Color, self.board.grid)
+            # if self.gameChoice is 1:
+            #     self.board.grid = self.remove_from_bottom(screen, 4, self.player1Color, self.board.grid)
 
             # check if game's over
             if self.check_win(self.player1Color) is True:
