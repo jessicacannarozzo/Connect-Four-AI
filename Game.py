@@ -28,18 +28,30 @@ class Game:
         self.initialize_pygame(screen)
         self.create_board(screen)
         running = True
-        ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, self.player1Color)
+        ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
+        ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
 
+        purple_win = 0
+        green_win = 0
+        tie = 0
         # self.add_counter(screen, 4, 1)
         # self.add_counter(screen, 4, 2)
         # self.add_counter(screen, 4, 1)
         # self.add_counter(screen, 4, 2)
-
 
         while running:
             pygame.time.delay(50)
 
             # both AI make a move
+            ai_one.update_counter()
+            self.add_counter(screen, ai_one.current_col, 1)
+
+            ai_two.update_grid(self.board)
+            ai_two.update_counter()
+            self.add_counter(screen, ai_two.current_col, 2)
+
+            ai_one.update_grid(self.board)
+
 
             # if self.gameChoice is 1:
             #     self.board.grid = self.remove_from_bottom(screen, 4, self.player1Color, self.board.grid)
@@ -47,18 +59,32 @@ class Game:
             # check if game's over
             if self.check_win(self.player1Color) is True:
                 print("Green won the game!")
+                green_win += 1
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
+                ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
                 self.create_board(screen)  # reset UI
             elif self.check_win(self.player2Color) is True:
                 print("Purple won the game!")
+                purple_win += 1
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
+                ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
                 self.create_board(screen)  # reset UI
             elif self.board.is_full() is True:
                 print("Tie game, all spaces are filled.")
+                tie += 1
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
+                ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
                 self.create_board(screen)  # reset UI
             pygame.event.pump()
             if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                print("\n\n")
+                print("Player 1 (Green) has won: " + str(green_win) + " out of " + str(green_win+purple_win+tie) + " games.")
+                print("Player 2 (Purple) has won: " + str(purple_win) + " out of " + str(green_win+purple_win+tie) + " games.")
+                print("Number of ties: " + str(tie) + " out of " + str(green_win+purple_win+tie) + " games.")
+
                 running = False
 
             pygame.display.flip()
@@ -129,12 +155,17 @@ class Game:
         if player_num == 1:
             green_slot = pygame.image.load(self.player1_counter_path).convert()
             x = self.board.add_counter(col, self.player1Color)
+            self.board.grid[x][col].color = self.player1Color
             # print(self.board.grid[x][y].color)
             screen.blit(green_slot, self.board.grid[x][col].rect)
 
         elif player_num == 2:
             purple_slot = pygame.image.load(self.player2_counter_path).convert()
             x = self.board.add_counter(col, self.player2Color)
+
+            print(x)
+            print(col)
+            self.board.grid[x][col].color = self.player2Color
             screen.blit(purple_slot, self.board.grid[x][col].rect)
 
         pygame.display.update()
