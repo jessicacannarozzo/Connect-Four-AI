@@ -20,7 +20,7 @@ class Board:
     # adds counter to bottom
     def add_counter(self, column, color):
         for x in reversed(range(self.height)):
-            print(str(x) + ", " + str(column))
+            # print(str(x) + ", " + str(column))
             if self.grid[x][column].has_counter() is False:
                 self.set_counter_color(x, column, color)
                 # print(self.grid[x][column].color)

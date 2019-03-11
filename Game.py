@@ -156,15 +156,11 @@ class Game:
             green_slot = pygame.image.load(self.player1_counter_path).convert()
             x = self.board.add_counter(col, self.player1Color)
             self.board.grid[x][col].color = self.player1Color
-            # print(self.board.grid[x][y].color)
             screen.blit(green_slot, self.board.grid[x][col].rect)
 
         elif player_num == 2:
             purple_slot = pygame.image.load(self.player2_counter_path).convert()
             x = self.board.add_counter(col, self.player2Color)
-
-            print(x)
-            print(col)
             self.board.grid[x][col].color = self.player2Color
             screen.blit(purple_slot, self.board.grid[x][col].rect)
 
