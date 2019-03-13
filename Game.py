@@ -1,6 +1,7 @@
 import pygame
 from assets.Board import Board
 from AI import AI
+import time
 
 
 class Game:
@@ -24,6 +25,7 @@ class Game:
         pygame.init()
         pygame.display.set_caption("Connect Four: COMP4106 Style")
         screen = pygame.display.set_mode((1500, 1500))
+        wait_time = 10
 
         self.initialize_pygame(screen)
         self.create_board(screen)
@@ -54,6 +56,7 @@ class Game:
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
                 ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                time.sleep(wait_time)
                 self.create_board(screen)  # reset UI
             elif self.check_win(self.player2Color) is True:
                 print("Purple won the game!")
@@ -61,6 +64,7 @@ class Game:
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
                 ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                time.sleep(wait_time)
                 self.create_board(screen)  # reset UI
             elif self.board.is_full() is True:
                 print("Tie game, all spaces are filled.")
@@ -68,6 +72,7 @@ class Game:
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
                 ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                time.sleep(wait_time)
                 self.create_board(screen)  # reset UI
 
             ai_two.update_counter()
@@ -85,6 +90,7 @@ class Game:
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
                 ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                time.sleep(wait_time)
                 self.create_board(screen)  # reset UI
             elif self.check_win(self.player2Color) is True:
                 print("Purple won the game!")
@@ -92,6 +98,7 @@ class Game:
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
                 ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                time.sleep(wait_time)
                 self.create_board(screen)  # reset UI
             elif self.board.is_full() is True:
                 print("Tie game, all spaces are filled.")
@@ -99,6 +106,7 @@ class Game:
                 self.board = Board(self.boardWidth, self.boardHeight)  # reset board
                 ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
                 ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                time.sleep(wait_time)
                 self.create_board(screen)  # reset UI
             pygame.event.pump()
             if pygame.key.get_pressed()[pygame.K_ESCAPE]:

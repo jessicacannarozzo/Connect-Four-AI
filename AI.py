@@ -177,9 +177,8 @@ class AI:
 
     # get board with child move
     def get_children(self, state, color):
-        children_states = []
+        children_states = {}  # col num : grid
         num_cols_full = 0
-        index = 0
 
         # print("Parent: " + str(parent.row) + ", " + str(parent.col))
         for col in range(self.board_cols):
@@ -187,14 +186,12 @@ class AI:
                 if state.is_col_full(col) is True:  # if we get to the end of the col without
                     print(str(col) + "YO")
                     num_cols_full += 1
-                    children_states.append(None)
                     break
                 if state.grid[row][col].has_counter() is False:
                     # children.append(Node(row, col, Node(parent.row, parent.col, other_color, parent)))
                     # children.append(Node(row, col, color, state))
-                    children_states.append(copy.deepcopy(state))
-                    children_states[index].add_counter(col, color)
-                    index += 1
+                    children_states[col] = copy.deepcopy(state)
+                    children_states[col].add_counter(col, color)
                     break
 
         print("Number of children is " + str(len(children_states)))
@@ -289,18 +286,18 @@ class AI:
             max_return[1] = self.eval_one(state)
             return max_return
 
-        for a, successor in enumerate(self.get_children(state, self.color)):
-            if successor is not None:
-                new_move = self.min_value(successor, depth - 1, alpha, beta)
-                # max_return[0] = a
-                if max_return[0] is None or new_move[1] > max_return[1]:
-                    print("WTF")
-                    max_return[0] = a
-                    max_return[1] = new_move[1]
-                    alpha = new_move[1]
+        child_dict = self.get_children(state, self.color)
+        for successor_col in list(child_dict):
+            new_move = self.min_value(child_dict[successor_col], depth - 1, alpha, beta)
+            # max_return[0] = a
+            if max_return[0] is None or new_move[1] > max_return[1]:
+                print("WTF")
+                max_return[0] = successor_col
+                max_return[1] = new_move[1]
+                alpha = new_move[1]
 
-                if alpha >= beta:
-                    return max_return
+            if alpha >= beta:
+                return max_return
         print("HELLO" + str(max_return))
         return max_return
 
@@ -309,14 +306,15 @@ class AI:
         if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
             min_return[1] = self.eval_one(state)
             return min_return
-        for a, successor in enumerate(self.get_children(state, self.other_color)):
-            if successor is not None:
-                new_move = self.max_value(successor, depth - 1, alpha, beta)
-                if min_return[0] is None or new_move[1] < min_return[1]:
-                    min_return[0] = a
-                    min_return[1] = new_move[1]
-                    beta = new_move[1]
-                if alpha >= beta:
-                    return min_return
+
+        child_dict = self.get_children(state, self.other_color)
+        for successor_col in list(child_dict):
+            new_move = self.max_value(child_dict[successor_col], depth - 1, alpha, beta)
+            if min_return[0] is None or new_move[1] < min_return[1]:
+                min_return[0] = successor_col
+                min_return[1] = new_move[1]
+                beta = new_move[1]
+            if alpha >= beta:
+                return min_return
         return min_return
 
