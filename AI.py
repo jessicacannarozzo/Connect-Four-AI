@@ -4,17 +4,18 @@ import copy
 
 
 class Node:
-    def __init__(self, row, col, color, parent):
+    def __init__(self, row, col, color, state=None, parent=None):
         self.row = row
         self.col = col
         self.color = color
         self.parent = parent
+        self.state = state
 
 
 class AI:
     def __init__(self, ai_method_choice, game_choice, board_rows, board_cols, ai_num, color, board):
         self.current_row = 5
-        self.current_col = 0
+        self.current_col = 3
         self.board_rows = board_rows
         self.board_cols = board_cols
         self.ai_method_choice = ai_method_choice
@@ -23,7 +24,7 @@ class AI:
         self.color = color
         self.board = board
         self.path = []
-        self.perceived = board
+        self.perceived = copy.deepcopy(self.board)
         # self.grid_tree = Node("5,0", row=5, col=0)
 
         if self.color is "PURPLE":
@@ -47,7 +48,7 @@ class AI:
             self.choose_random_moves()
             # self.get_children(Node(self.current_row, self.current_col, self.color, None))
         elif self.ai_method_choice is 1:
-            self.heuristic_one(Node(self.current_row, self.current_col, self.color, None), 4, 0, 0, True)
+            self.heuristic_one(self.perceived, 4, 0, 0, True)
             print(str(self.current_row) + ", " + str(self.current_col) + " hello")
         elif self.ai_method_choice is 2:
             self.heuristic_two()
@@ -69,28 +70,27 @@ class AI:
 
     # mini-max search with alpha beta pruning, heuristic one
     # https://www.youtube.com/watch?v=l-hh51ncgDI
-    def heuristic_one(self, position_node, depth, alpha, beta, maximizing_player):
-        if depth == 0 or self.game_over(self.form_grid(position_node), self.color):
-            return self.eval_one(position_node)
-
-        # print(position_node.color)
+    def heuristic_one(self, state, depth, alpha, beta, maximizing_player):
+        if depth == 0 or self.game_over(state, self.color):
+            return self.eval_one(state)
 
         if maximizing_player:
             max_eval = -float('infinity')
-            children = self.get_children(position_node)
+            children = self.get_children(state, self.other_color)
+            print(children[0].is_full() is False)
             for child in children:
                 eval_child = self.heuristic_one(child, depth - 1, alpha, beta, False)
                 max_eval = max(max_eval, eval_child)
                 alpha = max(alpha, eval_child)
                 if beta <= alpha:
                     break
-            self.current_row = position_node.row
-            self.current_col = position_node.col
+            # self.current_row = child.row
+            # self.current_col = child.col
             return max_eval
 
         else:
             min_eval = float('infinity')
-            children = self.get_children(position_node)
+            children = self.get_children(state, self.color)
             for child in children:
                 eval_child = self.heuristic_one(child, depth - 1, alpha, beta, True)
                 min_eval = min(min_eval, eval_child)
@@ -136,38 +136,64 @@ class AI:
                         return True
 
     # input: parent node
-    def get_children(self, parent):
-        children = []
+    # def get_children(self, parent):
+    #     children = []
+    #     num_cols_full = 0
+    #
+    #     perceived = self.form_grid(parent)
+    #
+    #     if parent.color is "PURPLE":
+    #         other_color = "GREEN"
+    #     else:
+    #         other_color = "PURPLE"
+    #
+    #     print("Parent: " + str(parent.row) + ", " + str(parent.col))
+    #     for col in range(self.board_cols):
+    #         for row in reversed(range(self.board_rows)):
+    #             # if self.perceived.grid[row][col].color is None:
+    #             if col is parent.col and row is parent.row and row-1 >= 0 and perceived.grid[row][col-1].has_counter() is False:
+    #                 # children.append(Node(row-1, col, Node(parent.row, parent.col, other_color, parent)))
+    #                 children.append(Node(row-1, col, other_color, parent))
+    #                 break
+    #             elif perceived.grid[row][col].has_counter() is False:
+    #                 # children.append(Node(row, col, Node(parent.row, parent.col, other_color, parent)))
+    #                 children.append(Node(row, col, other_color, parent))
+    #                 break
+    #             if perceived.is_col_full(col) is True:  # if we get to the end of the col without
+    #                 num_cols_full += 1
+    #                 break
+    #
+    #     print("Number of children is " + str(len(children)))
+    #     print("Number of rows full is " + str(num_cols_full))
+    #     for child in children:
+    #         print(str(child.row) + ", " + str(child.col))
+    #     return children
+
+    # get board with child move
+    def get_children(self, state, color):
+        children_states = []
         num_cols_full = 0
+        index = 0
 
-        perceived = self.form_grid(parent)
-
-        if parent.color is "PURPLE":
-            other_color = "GREEN"
-        else:
-            other_color = "PURPLE"
-
-        print("Parent: " + str(parent.row) + ", " + str(parent.col))
+        # print("Parent: " + str(parent.row) + ", " + str(parent.col))
         for col in range(self.board_cols):
             for row in reversed(range(self.board_rows)):
-                # if self.perceived.grid[row][col].color is None:
-                if col is parent.col and row is parent.row and row-1 >= 0 and perceived.grid[row][col-1].has_counter() is False:
-                    # children.append(Node(row-1, col, Node(parent.row, parent.col, other_color, parent)))
-                    children.append(Node(row-1, col, other_color, parent))
-                    break
-                elif perceived.grid[row][col].has_counter() is False:
+                if state.grid[row][col].has_counter() is False:
                     # children.append(Node(row, col, Node(parent.row, parent.col, other_color, parent)))
-                    children.append(Node(row, col, other_color, parent))
+                    # children.append(Node(row, col, color, state))
+                    children_states.append(copy.deepcopy(state))
+                    children_states[index].add_counter(col, color)
+                    index += 1
                     break
-                if perceived.is_col_full(col) is True:  # if we get to the end of the col without
+                if state.is_col_full(col) is True:  # if we get to the end of the col without
                     num_cols_full += 1
                     break
 
-        print("Number of children is " + str(len(children)))
+        print("Number of children is " + str(len(children_states)))
         print("Number of rows full is " + str(num_cols_full))
-        for child in children:
-            print(str(child.row) + ", " + str(child.col))
-        return children
+        for child in children_states:
+            print(child.is_full() is False)
+        return children_states
 
     # https://youtu.be/y7AKtWGOPAE?t=463
     # rate moves:
@@ -178,21 +204,16 @@ class AI:
     # lose connect four: -1000 points
     # opponent line of 2: -2 points
     # opponent line of 3: -3 points
-    def eval_one(self, position_node):
+    def eval_one(self, state):
         total_points = 0
-        grid = self.form_grid(position_node)
 
-        if self.game_over(grid, self.color):
+        if self.game_over(state, self.color):
             total_points += 1000
             return total_points
-        elif self.game_over(grid, self.other_color):
+        elif self.game_over(state, self.other_color):
             total_points += -1000
             return total_points
-
-        # for row in reversed(range(self.board_rows)):
-        #     for col in range(self.board_cols):
-
-
+        # else:
 
         return total_points
 
