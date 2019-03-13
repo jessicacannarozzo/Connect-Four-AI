@@ -1,5 +1,6 @@
 import random
 from anytree import Node, RenderTree, find_by_attr
+import copy
 
 
 class Node:
@@ -197,7 +198,7 @@ class AI:
 
     # form perceived grid
     def form_grid(self, position_node):
-        grid = self.board
+        grid = copy.deepcopy(self.board)
 
         while position_node is not None and grid.grid[position_node.row][position_node.col].has_counter() is False:
             grid.add_counter(position_node.col, position_node.color)
