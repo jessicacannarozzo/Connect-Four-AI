@@ -8,8 +8,8 @@ class Game:
     def __init__(self):
         # 0: play option 1 of game, 1: play option 2 of game where players are allowed to remove pieces from the bottom
         self.gameChoice = 0
-        self.first_ai_method_choice = 0
-        self.second_ai_method_choice = 0
+        self.first_ai_method_choice = 1
+        self.second_ai_method_choice = 1
 
         self.boardHeight = 6
         self.boardWidth = 7
@@ -51,7 +51,6 @@ class Game:
             self.add_counter(screen, ai_two.current_col, 2)
 
             ai_one.update_grid(self.board)
-
 
             # if self.gameChoice is 1:
             #     self.board.grid = self.remove_from_bottom(screen, 4, self.player1Color, self.board.grid)
