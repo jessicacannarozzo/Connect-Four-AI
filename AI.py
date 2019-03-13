@@ -184,15 +184,17 @@ class AI:
         # print("Parent: " + str(parent.row) + ", " + str(parent.col))
         for col in range(self.board_cols):
             for row in reversed(range(self.board_rows)):
+                if state.is_col_full(col) is True:  # if we get to the end of the col without
+                    print(str(col) + "YO")
+                    num_cols_full += 1
+                    children_states.append(None)
+                    break
                 if state.grid[row][col].has_counter() is False:
                     # children.append(Node(row, col, Node(parent.row, parent.col, other_color, parent)))
                     # children.append(Node(row, col, color, state))
                     children_states.append(copy.deepcopy(state))
                     children_states[index].add_counter(col, color)
                     index += 1
-                    break
-                if state.is_col_full(col) is True:  # if we get to the end of the col without
-                    num_cols_full += 1
                     break
 
         print("Number of children is " + str(len(children_states)))
@@ -288,11 +290,18 @@ class AI:
             return max_return
 
         for a, successor in enumerate(self.get_children(state, self.color)):
-            max_return = self.min_value(successor, depth - 1, alpha, beta)
-            max_return[0] = a
-            if max_return[1] >= beta:
-                return max_return
-            alpha = max(alpha, max_return[1])
+            if successor is not None:
+                new_move = self.min_value(successor, depth - 1, alpha, beta)
+                # max_return[0] = a
+                if max_return[0] is None or new_move[1] > max_return[1]:
+                    print("WTF")
+                    max_return[0] = a
+                    max_return[1] = new_move[1]
+                    alpha = new_move[1]
+
+                if alpha >= beta:
+                    return max_return
+        print("HELLO" + str(max_return))
         return max_return
 
     def min_value(self, state, depth, alpha, beta):
@@ -301,10 +310,13 @@ class AI:
             min_return[1] = self.eval_one(state)
             return min_return
         for a, successor in enumerate(self.get_children(state, self.other_color)):
-            min_return = self.max_value(successor, depth - 1, alpha, beta)
-            min_return[0] = a
-            if min_return[1] <= alpha:
-                return min_return
-            beta = min(beta, min_return[1])
+            if successor is not None:
+                new_move = self.max_value(successor, depth - 1, alpha, beta)
+                if min_return[0] is None or new_move[1] < min_return[1]:
+                    min_return[0] = a
+                    min_return[1] = new_move[1]
+                    beta = new_move[1]
+                if alpha >= beta:
+                    return min_return
         return min_return
 
