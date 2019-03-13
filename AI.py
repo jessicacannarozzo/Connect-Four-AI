@@ -48,7 +48,8 @@ class AI:
             self.choose_random_moves()
             # self.get_children(Node(self.current_row, self.current_col, self.color, None))
         elif self.ai_method_choice is 1:
-            self.current_col = self.heuristic_one(self.perceived, 4, -99999, 99999, True)[0]
+            self.alpha_beta_search(copy.deepcopy(self.board))
+            # self.current_col = self.heuristic_one(self.perceived, 4, -99999, 99999, True)[0]
             print(str(self.current_row) + ", " + str(self.current_col) + " hello")
         elif self.ai_method_choice is 2:
             self.heuristic_two()
@@ -68,9 +69,10 @@ class AI:
 
         print(output)
 
-    # def max_value(self, state, alpha, beta):
-    #     utility = self.
-    #     return utility
+    def alpha_beta_search(self, state):
+        move = self.max_value(state, 4, -99999, 99999)
+        print(str(move[0]) + " with value of " + str(move[1]))
+        return move[0]
 
     # mini-max search with alpha beta pruning, heuristic one
     # https://www.youtube.com/watch?v=l-hh51ncgDI
@@ -237,4 +239,29 @@ class AI:
         # print(output)
 
         return grid
+
+    def max_value(self, state, depth, alpha, beta):
+        max_return = [None, -99999]
+        if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
+            max_return[1] = self.eval_one(state)
+            return max_return
+
+        for a, successor in enumerate(self.get_children(state, self.color)):
+            max_return = self.min_value(state, depth - 1, alpha, beta)
+            if max_return[1] >= beta:
+                return max_return
+            alpha = max(alpha, max_return[1])
+        return max_return
+
+    def min_value(self, state, depth, alpha, beta):
+        min_return = [None, 99999]
+        if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
+            min_return[1] = self.eval_one(state)
+            return min_return
+        for a, successor in enumerate(self.get_children(state, self.other_color)):
+            min_return = self.max_value(state, depth - 1, alpha, beta)
+            if min_return[1] <= alpha:
+                return min_return
+            beta = min(beta, min_return[1])
+        return min_return
 
