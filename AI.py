@@ -14,8 +14,8 @@ class Node:
 
 class AI:
     def __init__(self, ai_method_choice, game_choice, board_rows, board_cols, ai_num, color, board):
-        self.current_row = 1
-        self.current_col = 3
+        # self.current_row = -1
+        self.current_col = -1
         self.board_rows = board_rows
         self.board_cols = board_cols
         self.ai_method_choice = ai_method_choice
@@ -30,7 +30,8 @@ class AI:
         if self.color is "PURPLE":
             self.other_color = "GREEN"
         else:
-            self.other_color = "GREEN"
+            self.other_color = "PURPLE"
+
 
     # AI plays using math.random to generate which col it will put a counter in.
     # if playing the second version of connect four, it will also random decide if it will remove one of its counters
@@ -51,7 +52,7 @@ class AI:
             self.current_col = self.alpha_beta_search(copy.deepcopy(self.board))
             print("FINAL COL " + str(self.current_col))
             # self.current_col = self.heuristic_one(self.perceived, 4, -99999, 99999, True)[0]
-            print(str(self.current_row) + ", " + str(self.current_col) + " hello")
+            # print(str(self.current_row) + ", " + str(self.current_col) + " hello")
         elif self.ai_method_choice is 2:
             self.heuristic_two()
         print("AI " + str(self.ai_num) + ": placing counter on column " + str(self.current_col))
@@ -196,14 +197,22 @@ class AI:
 
         print("Number of children is " + str(len(children_states)))
         print("Number of rows full is " + str(num_cols_full))
-        for child in children_states:
-            print(child.is_full() is False)
+        # for child in children_states:
+        #     print(child.is_full() is False)
         return children_states
 
     # https://github.com/Gimu/connect-four-js/blob/master/plain/alphabeta/js/board.js
+    # https://www.youtube.com/watch?v=y7AKtWGOPAE
     # count how many counters of ours VS theirs there are
     def eval_one(self, state):
         total_points = 0
+        output = []
+        for row in range(self.board_rows):
+            output.append("\n")
+            for col in range(self.board_cols):
+                output.append(state.grid[row][col].color)
+
+        print(str(output) + "FINAL")
 
         if self.game_over(state, self.color):
             total_points += 1000
@@ -212,12 +221,43 @@ class AI:
             total_points += -1000
             return total_points
         else:
-            for row in reversed(range(self.board_rows)):
-                for col in range(self.board_cols):
-                    if state.grid[row][col].color is self.color:
-                        total_points += 1
-                    elif state.grid[row][col].color is self.other_color:
-                        total_points -= 1
+            # check if adjacent nodes horizontally
+            for x in range(self.board_rows):
+                for y in range(self.board_cols - 2):
+                    if state.grid[x][y].color is self.color:
+                        if state.grid[x][y + 1].color is self.color:
+                            total_points += 2
+                            if state.grid[x][y + 2].color is self.color:
+                                total_points += 5
+                        if y == int(self.board_cols/2):
+                            print("OK")
+                            total_points += 4
+                    elif state.grid[x][y].color is self.other_color:
+                        if state.grid[x][y + 1].color is self.other_color:
+                            total_points -= 2
+                            if state.grid[x][y + 2].color is self.other_color:
+                                total_points -= 100
+
+            # # check if adjacent nodes vertically
+            # for x in range(self.board_cols):
+            #     for y in range(self.board_rows - 3):
+            #         if temp_board.grid[y][x].color is color:
+            #             if temp_board.grid[y + 1][x].color is color and temp_board.grid[y + 2][x].color is color and temp_board.grid[y + 3][x].color is color:
+            #                 return True
+            #
+            # # check diagonal \
+            # for x in range(self.board_rows - 3):
+            #     for y in range(self.board_cols - 3):
+            #         if temp_board.grid[x][y].color is color:
+            #             if temp_board.grid[x + 1][y + 1].color is color and temp_board.grid[x + 2][y + 2].color is color and temp_board.grid[x + 3][y + 3].color is color:
+            #                 return True
+            #
+            # # check diagonal /
+            # for x in range(self.board_rows - 3):
+            #     for y in reversed(range(3, self.board_cols)):
+            #         if temp_board.grid[x][y].color is color:
+            #             if temp_board.grid[x + 1][y - 1].color is color and temp_board.grid[x + 2][y - 2].color is color and temp_board.grid[x + 3][y - 3].color is color:
+            #                 return True
 
         print("Total points for this path: "+str(total_points))
         return total_points
