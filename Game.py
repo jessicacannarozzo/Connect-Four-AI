@@ -47,6 +47,29 @@ class Game:
             self.add_counter(screen, ai_one.current_col, 1)
 
             ai_two.update_grid(self.board)
+            # check if game's over
+            if self.check_win(self.player1Color) is True:
+                print("Green won the game!")
+                green_win += 1
+                self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
+                ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                self.create_board(screen)  # reset UI
+            elif self.check_win(self.player2Color) is True:
+                print("Purple won the game!")
+                purple_win += 1
+                self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
+                ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                self.create_board(screen)  # reset UI
+            elif self.board.is_full() is True:
+                print("Tie game, all spaces are filled.")
+                tie += 1
+                self.board = Board(self.boardWidth, self.boardHeight)  # reset board
+                ai_one = AI(self.first_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 1, self.player1Color, self.board)
+                ai_two = AI(self.second_ai_method_choice, self.gameChoice, self.boardHeight, self.boardWidth, 2, self.player2Color, self.board)
+                self.create_board(screen)  # reset UI
+
             ai_two.update_counter()
             self.add_counter(screen, ai_two.current_col, 2)
 

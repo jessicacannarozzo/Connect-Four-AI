@@ -14,7 +14,7 @@ class Node:
 
 class AI:
     def __init__(self, ai_method_choice, game_choice, board_rows, board_cols, ai_num, color, board):
-        self.current_row = 5
+        self.current_row = 1
         self.current_col = 3
         self.board_rows = board_rows
         self.board_cols = board_cols
@@ -48,7 +48,8 @@ class AI:
             self.choose_random_moves()
             # self.get_children(Node(self.current_row, self.current_col, self.color, None))
         elif self.ai_method_choice is 1:
-            self.alpha_beta_search(copy.deepcopy(self.board))
+            self.current_col = self.alpha_beta_search(copy.deepcopy(self.board))
+            print("FINAL COL " + str(self.current_col))
             # self.current_col = self.heuristic_one(self.perceived, 4, -99999, 99999, True)[0]
             print(str(self.current_row) + ", " + str(self.current_col) + " hello")
         elif self.ai_method_choice is 2:
@@ -247,7 +248,8 @@ class AI:
             return max_return
 
         for a, successor in enumerate(self.get_children(state, self.color)):
-            max_return = self.min_value(state, depth - 1, alpha, beta)
+            max_return = self.min_value(successor, depth - 1, alpha, beta)
+            max_return[0] = a
             if max_return[1] >= beta:
                 return max_return
             alpha = max(alpha, max_return[1])
@@ -259,7 +261,8 @@ class AI:
             min_return[1] = self.eval_one(state)
             return min_return
         for a, successor in enumerate(self.get_children(state, self.other_color)):
-            min_return = self.max_value(state, depth - 1, alpha, beta)
+            min_return = self.max_value(successor, depth - 1, alpha, beta)
+            min_return[0] = a
             if min_return[1] <= alpha:
                 return min_return
             beta = min(beta, min_return[1])
