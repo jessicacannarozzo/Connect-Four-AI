@@ -48,7 +48,7 @@ class AI:
             self.choose_random_moves()
             # self.get_children(Node(self.current_row, self.current_col, self.color, None))
         elif self.ai_method_choice is 1:
-            self.heuristic_one(self.perceived, 4, 0, 0, True)
+            self.current_col = self.heuristic_one(self.perceived, 4, -99999, 99999, True)[0]
             print(str(self.current_row) + ", " + str(self.current_col) + " hello")
         elif self.ai_method_choice is 2:
             self.heuristic_two()
@@ -68,33 +68,35 @@ class AI:
 
         print(output)
 
+    # def max_value(self, state, alpha, beta):
+    #     utility = self.
+    #     return utility
+
     # mini-max search with alpha beta pruning, heuristic one
     # https://www.youtube.com/watch?v=l-hh51ncgDI
+    # https://github.com/Gimu/connect-four-js/blob/master/plain/alphabeta/js/connect-four.js
     def heuristic_one(self, state, depth, alpha, beta, maximizing_player):
-        if depth == 0 or self.game_over(state, self.color):
+        if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
             return self.eval_one(state)
 
         if maximizing_player:
-            max_eval = -float('infinity')
+            max_eval = [-1, -99999]
             children = self.get_children(state, self.other_color)
-            print(children[0].is_full() is False)
-            for child in children:
+            for i, child in enumerate(children):
                 eval_child = self.heuristic_one(child, depth - 1, alpha, beta, False)
-                max_eval = max(max_eval, eval_child)
-                alpha = max(alpha, eval_child)
+                max_eval = [i, max(max_eval[1], eval_child[1])]
+                alpha = max(alpha, eval_child[1])
                 if beta <= alpha:
                     break
-            # self.current_row = child.row
-            # self.current_col = child.col
             return max_eval
 
         else:
-            min_eval = float('infinity')
+            min_eval = [-1, 99999]
             children = self.get_children(state, self.color)
-            for child in children:
+            for i, child in enumerate(children):
                 eval_child = self.heuristic_one(child, depth - 1, alpha, beta, True)
-                min_eval = min(min_eval, eval_child)
-                beta = min(beta, eval_child)
+                min_eval = [i, min(min_eval[1], eval_child[1])]
+                beta = min(beta, eval_child[1])
                 if beta <= alpha:
                     break
             return min_eval
@@ -195,15 +197,8 @@ class AI:
             print(child.is_full() is False)
         return children_states
 
-    # https://youtu.be/y7AKtWGOPAE?t=463
-    # rate moves:
-    # 2 adjacent tiles: 2 points
-    # 3 tiles: 3 points
-    # tile in center: 4 points
-    # win connect four: 1000 points
-    # lose connect four: -1000 points
-    # opponent line of 2: -2 points
-    # opponent line of 3: -3 points
+    # https://github.com/Gimu/connect-four-js/blob/master/plain/alphabeta/js/board.js
+    # count how many counters of ours VS theirs there are
     def eval_one(self, state):
         total_points = 0
 
@@ -213,8 +208,15 @@ class AI:
         elif self.game_over(state, self.other_color):
             total_points += -1000
             return total_points
-        # else:
+        else:
+            for row in reversed(range(self.board_rows)):
+                for col in range(self.board_cols):
+                    if state.grid[row][col].color is self.color:
+                        total_points += 1
+                    elif state.grid[row][col].color is self.other_color:
+                        total_points -= 1
 
+        print("Total points for this path: "+str(total_points))
         return total_points
 
     # form perceived grid
