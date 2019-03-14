@@ -1,3 +1,9 @@
+# Author: Jess Cannarozzo
+# sources:
+# https://github.com/Gimu/connect-four-js/blob/master/plain/alphabeta/js/connect-four.js
+# https://www.youtube.com/watch?v=l-hh51ncgDI
+# https://www.youtube.com/watch?v=y7AKtWGOPAE
+
 import random
 from anytree import Node, RenderTree, find_by_attr
 import copy
@@ -229,7 +235,6 @@ class AI:
                             if state.grid[x][y + 2].color is self.color:
                                 total_points += 5
                         if y == int(self.board_cols/2):
-                            print("OK")
                             total_points += 4
                     elif state.grid[x][y].color is self.other_color:
                         if state.grid[x][y + 1].color is self.other_color:
@@ -237,26 +242,67 @@ class AI:
                             if state.grid[x][y + 2].color is self.other_color:
                                 total_points -= 100
 
-            # # check if adjacent nodes vertically
-            # for x in range(self.board_cols):
-            #     for y in range(self.board_rows - 3):
-            #         if temp_board.grid[y][x].color is color:
-            #             if temp_board.grid[y + 1][x].color is color and temp_board.grid[y + 2][x].color is color and temp_board.grid[y + 3][x].color is color:
-            #                 return True
-            #
-            # # check diagonal \
-            # for x in range(self.board_rows - 3):
-            #     for y in range(self.board_cols - 3):
-            #         if temp_board.grid[x][y].color is color:
-            #             if temp_board.grid[x + 1][y + 1].color is color and temp_board.grid[x + 2][y + 2].color is color and temp_board.grid[x + 3][y + 3].color is color:
-            #                 return True
-            #
-            # # check diagonal /
-            # for x in range(self.board_rows - 3):
-            #     for y in reversed(range(3, self.board_cols)):
-            #         if temp_board.grid[x][y].color is color:
-            #             if temp_board.grid[x + 1][y - 1].color is color and temp_board.grid[x + 2][y - 2].color is color and temp_board.grid[x + 3][y - 3].color is color:
-            #                 return True
+            # check if adjacent nodes vertically
+            for x in range(self.board_cols):
+                for y in range(self.board_rows - 2):
+                    num_adjacent = 0
+                    if state.grid[y][x].color is self.color:
+                        num_adjacent += 1
+                        if state.grid[y + 1][x].color is self.color:
+                            num_adjacent += 1
+                            total_points += 2
+                            if state.grid[y + 2][x].color is self.color:
+                                num_adjacent += 1
+                                total_points += 5
+                        if y == int(self.board_cols/2):
+                            # or y+1 == int(self.board_cols/2) or y+2 == int(self.board_cols/2):
+                            total_points += 4*num_adjacent
+                    elif state.grid[y][x].color is self.other_color:
+                        if state.grid[y + 1][x].color is self.other_color:
+                            total_points -= 2
+                            if state.grid[y + 2][x].color is self.other_color:
+                                total_points -= 100
+
+            # check diagonal \
+            for x in range(self.board_rows - 2):
+                for y in range(self.board_cols - 2):
+                    if state.grid[x][y].color is self.color:
+                        if state.grid[x + 1][y + 1].color is self.color:
+                            total_points += 2
+                            if y+1 == int(self.board_cols/2):
+                                total_points += 4
+                            if state.grid[x + 2][y + 2].color is self.color:
+                                total_points += 5
+                                if y+2 == int(self.board_cols/2):
+                                    total_points += 4
+                        if y == int(self.board_cols/2):
+                            total_points += 4
+                    elif state.grid[x][y].color is self.other_color:
+                        if state.grid[x + 1][y + 1].color is self.other_color:
+                            total_points -= 2
+                            if state.grid[x + 2][y + 2].color is self.other_color:
+                                total_points -= 100
+
+            # check diagonal /
+            for x in range(self.board_rows - 2):
+                for y in reversed(range(2, self.board_cols)):
+                    if state.grid[x][y].color is self.color:
+                        if state.grid[x + 1][y - 1].color is self.color:
+                            total_points += 2
+                            if y - 1 == int(self.board_cols/2):
+                                total_points += 4
+                            if state.grid[x + 2][y - 2].color is self.color:
+                                total_points += 5
+                                if y - 2 == int(self.board_cols/2):
+                                    total_points += 4
+                        if y == int(self.board_cols/2):
+                            total_points += 4
+                    elif state.grid[x][y].color is self.other_color:
+                        if state.grid[x + 1][y - 1].color is self.other_color:
+                            total_points -= 2
+                            if state.grid[x + 2][y - 2].color is self.color:
+                                total_points -= 100
+
 
         print("Total points for this path: "+str(total_points))
         return total_points
