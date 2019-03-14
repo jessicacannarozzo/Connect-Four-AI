@@ -9,7 +9,7 @@ class Game:
     def __init__(self):
         # 0: play option 1 of game, 1: play option 2 of game where players are allowed to remove pieces from the bottom
         self.gameChoice = 0
-        self.first_ai_method_choice = 2
+        self.first_ai_method_choice = 1
         self.second_ai_method_choice = 2
 
         self.boardHeight = 6

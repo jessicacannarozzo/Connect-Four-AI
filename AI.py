@@ -30,13 +30,13 @@ class AI:
         self.board = board
         self.path = []
         self.perceived = copy.deepcopy(self.board)
+        self.nodes_searched = 0
         # self.grid_tree = Node("5,0", row=5, col=0)
 
         if self.color is "PURPLE":
             self.other_color = "GREEN"
         else:
             self.other_color = "PURPLE"
-
 
     # AI plays using math.random to generate which col it will put a counter in.
     # if playing the second version of connect four, it will also random decide if it will remove one of its counters
@@ -50,13 +50,16 @@ class AI:
 
     # update AI move
     def update_counter(self):
+        self.nodes_searched = 0
         if self.ai_method_choice is 0:
             self.choose_random_moves()
             # self.get_children(Node(self.current_row, self.current_col, self.color, None))
         elif self.ai_method_choice is 1:
             self.current_col = self.alpha_beta_search(copy.deepcopy(self.board))
+            print("Nodes searched: " + str(self.nodes_searched))
         elif self.ai_method_choice is 2:
             self.current_col = self.alpha_beta_search_two(copy.deepcopy(self.board))
+            print("Nodes searched: " + str(self.nodes_searched))
         print("AI " + str(self.ai_num) + ": placing counter on column " + str(self.current_col))
 
     def update_grid(self, board):
@@ -149,8 +152,6 @@ class AI:
             output.append("\n")
             for col in range(self.board_cols):
                 output.append(state.grid[row][col].color)
-
-        print(str(output) + "FINAL")
 
         if self.game_over(state, self.color):
             total_points += 1000
@@ -266,6 +267,7 @@ class AI:
             return max_return
 
         child_dict = self.get_children(state, self.color)
+        self.nodes_searched += len(list(child_dict))
         for successor_col in list(child_dict):
             new_move = self.min_value(child_dict[successor_col], depth - 1, alpha, beta)
             # max_return[0] = a
@@ -287,6 +289,7 @@ class AI:
             return min_return
 
         child_dict = self.get_children(state, self.other_color)
+        self.nodes_searched += len(list(child_dict))
         for successor_col in list(child_dict):
             new_move = self.max_value(child_dict[successor_col], depth - 1, alpha, beta)
             if min_return[0] is None or new_move[1] < min_return[1]:
@@ -305,6 +308,7 @@ class AI:
             return max_return
 
         child_dict = self.get_children(state, self.color)
+        self.nodes_searched += len(list(child_dict))
         for successor_col in list(child_dict):
             new_move = self.min_value_two(child_dict[successor_col], depth - 1, alpha, beta)
             # max_return[0] = a
@@ -325,6 +329,7 @@ class AI:
             return min_return
 
         child_dict = self.get_children(state, self.other_color)
+        self.nodes_searched += len(list(child_dict))
         for successor_col in list(child_dict):
             new_move = self.max_value_two(child_dict[successor_col], depth - 1, alpha, beta)
             if min_return[0] is None or new_move[1] < min_return[1]:
