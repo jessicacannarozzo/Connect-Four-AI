@@ -9,8 +9,8 @@ class Game:
     def __init__(self):
         # 0: play option 1 of game, 1: play option 2 of game where players are allowed to remove pieces from the bottom
         self.gameChoice = 0
-        self.first_ai_method_choice = 1
-        self.second_ai_method_choice = 0
+        self.first_ai_method_choice = 2
+        self.second_ai_method_choice = 2
 
         self.boardHeight = 6
         self.boardWidth = 7
@@ -20,12 +20,15 @@ class Game:
         self.empty_slot_path = 'assets/images/empty-slot.png'
         self.player1_counter_path = 'assets/images/green-counter.png'
         self.player2_counter_path = 'assets/images/purple-counter.png'
+        self.is_human = 0  # 0 for false, 1 for true
 
     def main(self):
+        self.is_human = int(input("0: AI or 1:Human?"))
         pygame.init()
         pygame.display.set_caption("Connect Four: COMP4106 Style")
         screen = pygame.display.set_mode((1500, 1500))
         wait_time = 10
+
 
         self.initialize_pygame(screen)
         self.create_board(screen)
@@ -48,7 +51,9 @@ class Game:
             ai_one.update_counter()
             self.add_counter(screen, ai_one.current_col, 1)
 
-            ai_two.update_grid(self.board)
+            if self.is_human == 0:
+                ai_two.update_grid(self.board)
+
             # check if game's over
             if self.check_win(self.player1Color) is True:
                 print("Green won the game!")
@@ -75,8 +80,12 @@ class Game:
                 time.sleep(wait_time)
                 self.create_board(screen)  # reset UI
 
-            ai_two.update_counter()
-            self.add_counter(screen, ai_two.current_col, 2)
+            if self.is_human == 0:
+                ai_two.update_counter()
+                self.add_counter(screen, ai_two.current_col, 2)
+            else:
+                print(str(self.is_human))
+                self.add_counter(screen, int(input("Enter a col")), 2)
 
             ai_one.update_grid(self.board)
 

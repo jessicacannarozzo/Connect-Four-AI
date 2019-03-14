@@ -5,7 +5,6 @@
 # https://www.youtube.com/watch?v=y7AKtWGOPAE
 
 import random
-from anytree import Node, RenderTree, find_by_attr
 import copy
 
 
@@ -56,11 +55,8 @@ class AI:
             # self.get_children(Node(self.current_row, self.current_col, self.color, None))
         elif self.ai_method_choice is 1:
             self.current_col = self.alpha_beta_search(copy.deepcopy(self.board))
-            print("FINAL COL " + str(self.current_col))
-            # self.current_col = self.heuristic_one(self.perceived, 4, -99999, 99999, True)[0]
-            # print(str(self.current_row) + ", " + str(self.current_col) + " hello")
         elif self.ai_method_choice is 2:
-            self.heuristic_two()
+            self.current_col = self.alpha_beta_search_two(copy.deepcopy(self.board))
         print("AI " + str(self.ai_num) + ": placing counter on column " + str(self.current_col))
 
     def update_grid(self, board):
@@ -82,39 +78,10 @@ class AI:
         print(str(move[0]) + " with value of " + str(move[1]))
         return move[0]
 
-    # mini-max search with alpha beta pruning, heuristic one
-    # https://www.youtube.com/watch?v=l-hh51ncgDI
-    # https://github.com/Gimu/connect-four-js/blob/master/plain/alphabeta/js/connect-four.js
-    def heuristic_one(self, state, depth, alpha, beta, maximizing_player):
-        if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
-            return self.eval_one(state)
-
-        if maximizing_player:
-            max_eval = [-1, -99999]
-            children = self.get_children(state, self.other_color)
-            for i, child in enumerate(children):
-                eval_child = self.heuristic_one(child, depth - 1, alpha, beta, False)
-                max_eval = [i, max(max_eval[1], eval_child[1])]
-                alpha = max(alpha, eval_child[1])
-                if beta <= alpha:
-                    break
-            return max_eval
-
-        else:
-            min_eval = [-1, 99999]
-            children = self.get_children(state, self.color)
-            for i, child in enumerate(children):
-                eval_child = self.heuristic_one(child, depth - 1, alpha, beta, True)
-                min_eval = [i, min(min_eval[1], eval_child[1])]
-                beta = min(beta, eval_child[1])
-                if beta <= alpha:
-                    break
-            return min_eval
-
-    # mini-max search with alpha beta pruning, heuristic two
-    # https://www.youtube.com/watch?v=l-hh51ncgDI
-    def heuristic_two(self):
-        pass
+    def alpha_beta_search_two(self, state):
+        move = self.max_value_two(state, 4, -99999, 99999)
+        print(str(move[0]) + " with value of " + str(move[1]))
+        return move[0]
 
     # check if game is over i.e. if there is four in a row anywhere
     def game_over(self, temp_board, color):
@@ -146,40 +113,6 @@ class AI:
                 if temp_board.grid[x][y].color is color:
                     if temp_board.grid[x + 1][y - 1].color is color and temp_board.grid[x + 2][y - 2].color is color and temp_board.grid[x + 3][y - 3].color is color:
                         return True
-
-    # input: parent node
-    # def get_children(self, parent):
-    #     children = []
-    #     num_cols_full = 0
-    #
-    #     perceived = self.form_grid(parent)
-    #
-    #     if parent.color is "PURPLE":
-    #         other_color = "GREEN"
-    #     else:
-    #         other_color = "PURPLE"
-    #
-    #     print("Parent: " + str(parent.row) + ", " + str(parent.col))
-    #     for col in range(self.board_cols):
-    #         for row in reversed(range(self.board_rows)):
-    #             # if self.perceived.grid[row][col].color is None:
-    #             if col is parent.col and row is parent.row and row-1 >= 0 and perceived.grid[row][col-1].has_counter() is False:
-    #                 # children.append(Node(row-1, col, Node(parent.row, parent.col, other_color, parent)))
-    #                 children.append(Node(row-1, col, other_color, parent))
-    #                 break
-    #             elif perceived.grid[row][col].has_counter() is False:
-    #                 # children.append(Node(row, col, Node(parent.row, parent.col, other_color, parent)))
-    #                 children.append(Node(row, col, other_color, parent))
-    #                 break
-    #             if perceived.is_col_full(col) is True:  # if we get to the end of the col without
-    #                 num_cols_full += 1
-    #                 break
-    #
-    #     print("Number of children is " + str(len(children)))
-    #     print("Number of rows full is " + str(num_cols_full))
-    #     for child in children:
-    #         print(str(child.row) + ", " + str(child.col))
-    #     return children
 
     # get board with child move
     def get_children(self, state, color):
@@ -303,7 +236,6 @@ class AI:
                             if state.grid[x + 2][y - 2].color is self.color:
                                 total_points -= 100
 
-
         print("Total points for this path: "+str(total_points))
         return total_points
 
@@ -326,6 +258,7 @@ class AI:
 
         return grid
 
+    # get max value for mini max search with alpha-beta pruning: heuristic one
     def max_value(self, state, depth, alpha, beta):
         max_return = [None, -99999]
         if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
@@ -337,16 +270,16 @@ class AI:
             new_move = self.min_value(child_dict[successor_col], depth - 1, alpha, beta)
             # max_return[0] = a
             if max_return[0] is None or new_move[1] > max_return[1]:
-                print("WTF")
                 max_return[0] = successor_col
                 max_return[1] = new_move[1]
                 alpha = new_move[1]
 
             if alpha >= beta:
                 return max_return
-        print("HELLO" + str(max_return))
+        # print("HELLO" + str(max_return))
         return max_return
 
+    # get min value for mini max search with alpha-beta pruning: heuristic one
     def min_value(self, state, depth, alpha, beta):
         min_return = [None, 99999]
         if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
@@ -363,4 +296,117 @@ class AI:
             if alpha >= beta:
                 return min_return
         return min_return
+
+    # get max value for mini max search with alpha-beta pruning: heuristic two
+    def max_value_two(self, state, depth, alpha, beta):
+        max_return = [None, -99999]
+        if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
+            max_return[1] = self.eval_two(state)
+            return max_return
+
+        child_dict = self.get_children(state, self.color)
+        for successor_col in list(child_dict):
+            new_move = self.min_value_two(child_dict[successor_col], depth - 1, alpha, beta)
+            # max_return[0] = a
+            if max_return[0] is None or new_move[1] > max_return[1]:
+                max_return[0] = successor_col
+                max_return[1] = new_move[1]
+                alpha = new_move[1]
+
+            if alpha >= beta:
+                return max_return
+        return max_return
+
+    # get min value for mini max search with alpha-beta pruning: heuristic two
+    def min_value_two(self, state, depth, alpha, beta):
+        min_return = [None, 99999]
+        if depth == 0 or self.game_over(state, self.color) or self.game_over(state, self.other_color) or state.is_full() is True:
+            min_return[1] = self.eval_two(state)
+            return min_return
+
+        child_dict = self.get_children(state, self.other_color)
+        for successor_col in list(child_dict):
+            new_move = self.max_value_two(child_dict[successor_col], depth - 1, alpha, beta)
+            if min_return[0] is None or new_move[1] < min_return[1]:
+                min_return[0] = successor_col
+                min_return[1] = new_move[1]
+                beta = new_move[1]
+            if alpha >= beta:
+                return min_return
+        return min_return
+
+    # like eval one, but puts more emphasis on the AI playing defensively. It also does not have any preference towards the center of the board
+    def eval_two(self, state):
+        total_points = 0
+        output = []
+        for row in range(self.board_rows):
+            output.append("\n")
+            for col in range(self.board_cols):
+                output.append(state.grid[row][col].color)
+
+        if self.game_over(state, self.color):
+            total_points += 1000
+            return total_points
+        elif self.game_over(state, self.other_color):
+            total_points += -1000
+            return total_points
+        else:
+            # check if adjacent nodes horizontally
+            for x in range(self.board_rows):
+                for y in range(self.board_cols - 2):
+                    if state.grid[x][y].color is self.color:
+                        if state.grid[x][y + 1].color is self.color:
+                            total_points += 2
+                            if state.grid[x][y + 2].color is self.color:
+                                total_points += 5
+                    elif state.grid[x][y].color is self.other_color:
+                        if state.grid[x][y + 1].color is self.other_color:
+                            total_points -= 5
+                            if state.grid[x][y + 2].color is self.other_color:
+                                total_points -= 100
+
+            # check if adjacent nodes vertically
+            for x in range(self.board_cols):
+                for y in range(self.board_rows - 2):
+                    if state.grid[y][x].color is self.color:
+                        if state.grid[y + 1][x].color is self.color:
+                            total_points += 2
+                            if state.grid[y + 2][x].color is self.color:
+                                total_points += 5
+                    elif state.grid[y][x].color is self.other_color:
+                        if state.grid[y + 1][x].color is self.other_color:
+                            total_points -= 2
+                            if state.grid[y + 2][x].color is self.other_color:
+                                total_points -= 100
+
+            # check diagonal \
+            for x in range(self.board_rows - 2):
+                for y in range(self.board_cols - 2):
+                    if state.grid[x][y].color is self.color:
+                        if state.grid[x + 1][y + 1].color is self.color:
+                            total_points += 2
+                            if state.grid[x + 2][y + 2].color is self.color:
+                                total_points += 5
+                    elif state.grid[x][y].color is self.other_color:
+                        if state.grid[x + 1][y + 1].color is self.other_color:
+                            total_points -= 2
+                            if state.grid[x + 2][y + 2].color is self.other_color:
+                                total_points -= 100
+
+            # check diagonal /
+            for x in range(self.board_rows - 2):
+                for y in reversed(range(2, self.board_cols)):
+                    if state.grid[x][y].color is self.color:
+                        if state.grid[x + 1][y - 1].color is self.color:
+                            total_points += 2
+                            if state.grid[x + 2][y - 2].color is self.color:
+                                total_points += 5
+                    elif state.grid[x][y].color is self.other_color:
+                        if state.grid[x + 1][y - 1].color is self.other_color:
+                            total_points -= 2
+                            if state.grid[x + 2][y - 2].color is self.color:
+                                total_points -= 100
+
+        print("Total points for this path: "+str(total_points))
+        return total_points
 
